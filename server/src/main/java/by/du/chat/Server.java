@@ -12,6 +12,8 @@ public class Server {
 
     public static void main(String[] args) {
 
+        final Publisher publisher = new Publisher();
+
         final ExecutorService service = Executors.newCachedThreadPool();
 
         try (final ServerSocket serverSocket = new ServerSocket(PORT)) {
@@ -19,35 +21,10 @@ public class Server {
             while (true) {
                 System.out.println("Server started, waiting connection...");
                 final Socket socket = serverSocket.accept();
-                service.submit(new ServerThread(socket));
+                System.out.printf("Accepted client with IP: %s\n", socket.getInetAddress());
+                service.submit(new ServerListener(socket, publisher));
             }
 
-        } catch (IOException ex) {
-            System.err.println(ex.getMessage());
-        }
-    }
-}
-
-class ServerThread implements Runnable {
-
-    public ServerThread(Socket socket) {
-        this.socket = socket;
-    }
-
-    private final Socket socket;
-
-    @Override
-    public void run() {
-        System.out.printf("Accepted client with IP: %s\n", socket.getInetAddress());
-        try (final DataInputStream in = new DataInputStream(socket.getInputStream());
-             final DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {
-
-            final String req = in.readUTF();
-
-            System.out.printf("Client: %s\n", req);
-
-            out.writeUTF(req);
-            out.flush();
         } catch (IOException ex) {
             System.err.println(ex.getMessage());
         }
