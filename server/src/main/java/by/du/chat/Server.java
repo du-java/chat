@@ -13,22 +13,41 @@ public class Server {
 
     public static void main(String[] args) {
         try (final ServerSocket serverSocket = new ServerSocket(PORT)) {
-            System.out.println("Server started, waiting connection...");
-            final Socket socket = serverSocket.accept();
-            System.out.printf("Accepted client with IP: %s\n", socket.getInetAddress());
-            try (final InputStream in = socket.getInputStream();
-                 final OutputStream out = socket.getOutputStream()) {
 
-                final byte[] buffer = new byte[4096];
-                final int data = in.read(buffer);
-
-                final String msg = new String(buffer, 0, data);
-                System.out.printf("Client: %s\n", msg);
-
-                out.write(msg.getBytes(StandardCharsets.UTF_8));
-                out.flush();
+            while (true) {
+                System.out.println("Server started, waiting connection...");
+                final Socket socket = serverSocket.accept();
+                new Thread(new ServerThread(socket)).start();
             }
 
+        } catch (IOException ex) {
+            System.err.println(ex.getMessage());
+        }
+    }
+}
+
+class ServerThread implements Runnable {
+
+    public ServerThread(Socket socket) {
+        this.socket = socket;
+    }
+
+    private final Socket socket;
+
+    @Override
+    public void run() {
+        System.out.printf("Accepted client with IP: %s\n", socket.getInetAddress());
+        try (final InputStream in = socket.getInputStream();
+             final OutputStream out = socket.getOutputStream()) {
+
+            final byte[] buffer = new byte[4096];
+            final int data = in.read(buffer);
+
+            final String msg = new String(buffer, 0, data);
+            System.out.printf("Client: %s\n", msg);
+
+            out.write(msg.getBytes(StandardCharsets.UTF_8));
+            out.flush();
         } catch (IOException ex) {
             System.err.println(ex.getMessage());
         }
