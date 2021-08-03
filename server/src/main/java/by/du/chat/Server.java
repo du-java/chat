@@ -13,9 +13,9 @@ public class Server {
 
     public static void main(String[] args) {
         try (final ServerSocket serverSocket = new ServerSocket(PORT)) {
-
+            System.out.println("Server started, waiting connection...");
             final Socket socket = serverSocket.accept();
-
+            System.out.printf("Accepted client with IP: %s\n", socket.getInetAddress());
             try (final InputStream in = socket.getInputStream();
                  final OutputStream out = socket.getOutputStream()) {
 
@@ -23,7 +23,7 @@ public class Server {
                 final int data = in.read(buffer);
 
                 final String msg = new String(buffer, 0, data);
-                System.out.printf("Client: %s", msg);
+                System.out.printf("Client: %s\n", msg);
 
                 out.write(msg.getBytes(StandardCharsets.UTF_8));
                 out.flush();

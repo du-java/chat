@@ -24,7 +24,7 @@ public class Client {
                 final byte[] buffer = new byte[4096];
                 final int data = in.read(buffer);
 
-                System.out.printf("Server: %s", new String(buffer, 0, data));
+                System.out.printf("Server: %s\n", new String(buffer, 0, data));
             }
         } catch (IOException ex) {
             System.err.println(ex.getMessage());
