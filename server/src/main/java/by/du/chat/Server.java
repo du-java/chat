@@ -8,7 +8,7 @@ import java.util.concurrent.Executors;
 
 public class Server {
 
-    private static final int PORT = 10000;
+    private static final int PORT = 10_000;
 
     public static void main(String[] args) {
 
@@ -22,7 +22,7 @@ public class Server {
                 System.out.println("Server started, waiting connection...");
                 final Socket socket = serverSocket.accept();
                 System.out.printf("Accepted client with IP: %s\n", socket.getInetAddress());
-                service.submit(new ServerListener(socket, publisher));
+                service.submit(new ServerListener(socket, publisher)); // new Thread(new ServerListener(socket, publisher)).start();
             }
 
         } catch (IOException ex) {

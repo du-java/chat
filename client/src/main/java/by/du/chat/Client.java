@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 public class Client {
 
-    private static final int PORT = 10000;
+    private static final int PORT = 10_000;
     private static final String HOST = "localhost";
     private static final Scanner SCANNER = new Scanner(System.in);
 
