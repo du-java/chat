@@ -19,6 +19,7 @@ public class ServerListener implements Runnable {
 
             publisher.subscribe(new Subscriber(socket));
             String name = in.readUTF();
+            publisher.newMessage(name, "is connected");
 
             while (true) {
                 final String msg = in.readUTF();
