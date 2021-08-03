@@ -1,23 +1,25 @@
 package by.du.chat;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Server {
 
     private static final int PORT = 10000;
 
     public static void main(String[] args) {
+
+        final ExecutorService service = Executors.newCachedThreadPool();
+
         try (final ServerSocket serverSocket = new ServerSocket(PORT)) {
 
             while (true) {
                 System.out.println("Server started, waiting connection...");
                 final Socket socket = serverSocket.accept();
-                new Thread(new ServerThread(socket)).start();
+                service.submit(new ServerThread(socket));
             }
 
         } catch (IOException ex) {
@@ -37,16 +39,14 @@ class ServerThread implements Runnable {
     @Override
     public void run() {
         System.out.printf("Accepted client with IP: %s\n", socket.getInetAddress());
-        try (final InputStream in = socket.getInputStream();
-             final OutputStream out = socket.getOutputStream()) {
+        try (final DataInputStream in = new DataInputStream(socket.getInputStream());
+             final DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {
 
-            final byte[] buffer = new byte[4096];
-            final int data = in.read(buffer);
+            final String req = in.readUTF();
 
-            final String msg = new String(buffer, 0, data);
-            System.out.printf("Client: %s\n", msg);
+            System.out.printf("Client: %s\n", req);
 
-            out.write(msg.getBytes(StandardCharsets.UTF_8));
+            out.writeUTF(req);
             out.flush();
         } catch (IOException ex) {
             System.err.println(ex.getMessage());

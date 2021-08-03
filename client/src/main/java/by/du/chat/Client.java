@@ -1,10 +1,7 @@
 package by.du.chat;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 
 public class Client {
 
@@ -14,17 +11,16 @@ public class Client {
     public static void main(String[] args) {
         try (final Socket socket = new Socket(HOST, PORT)) {
 
-            try (final InputStream in = socket.getInputStream();
-                 final OutputStream out = socket.getOutputStream()) {
+            try (final DataInputStream in = new DataInputStream(socket.getInputStream());
+                 final DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {
 
-                String msg = "Hi";
-                out.write(msg.getBytes(StandardCharsets.UTF_8));
+                String req = "Hi";
+                out.writeUTF(req);
                 out.flush();
 
-                final byte[] buffer = new byte[4096];
-                final int data = in.read(buffer);
+                final String resp = in.readUTF();
 
-                System.out.printf("Server: %s\n", new String(buffer, 0, data));
+                System.out.printf("Server: %s\n", resp);
             }
         } catch (IOException ex) {
             System.err.println(ex.getMessage());
