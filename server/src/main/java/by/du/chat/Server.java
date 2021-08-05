@@ -1,22 +1,53 @@
 package by.du.chat;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
+@Component
+//@Scope(scopeName = "prototype")
+@RequiredArgsConstructor
 public class Server {
 
-    private static final int PORT = 10_000;
+    @Value("${server.port}")
+    private int port;
 
-    public static void main(String[] args) {
+//    @Autowired
+//    public Server(ExecutorService service, Publisher publisher) {
+//        this.service = service;
+//        this.publisher = publisher;
+//    }
 
-        final Publisher publisher = new Publisher();
+    private final ExecutorService service;
+    private final Publisher publisher;
 
-        final ExecutorService service = Executors.newCachedThreadPool();
+//    @Autowired
+//    @Qualifier("pub1")
+//    private Publisher publisher;
 
-        try (final ServerSocket serverSocket = new ServerSocket(PORT)) {
+
+//    @Autowired
+//    private ExecutorService service;
+//
+//    private Publisher publisher;
+//
+//    @Autowired
+//    public void setPublisher(Publisher publisher) {
+//        this.publisher = publisher;
+//    }
+
+    public void start() {
+
+        try (final ServerSocket serverSocket = new ServerSocket(port)) {
 
             while (true) {
                 System.out.println("Server started, waiting connection...");
@@ -28,5 +59,19 @@ public class Server {
         } catch (IOException ex) {
             System.err.println(ex.getMessage());
         }
+    }
+
+    @PostConstruct
+    private void postConstruct() {
+        System.out.println("@PostConstruct");
+    }
+
+    public void init() {
+        System.out.println("init");
+    }
+
+    @PreDestroy
+    private void preDestroy() {
+        System.out.println("@PreDestroy");
     }
 }
